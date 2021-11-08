@@ -14,6 +14,7 @@ import java.util.Map;
 public class PingTracker extends Tracker {
 
     private final Map<Short, Long> transactionMap = new HashMap<>();
+
     private short lastTransactionId;
     private long lastPing;
 
@@ -27,10 +28,23 @@ public class PingTracker extends Tracker {
             WrappedPacketPlayOutTransaction packet = (WrappedPacketPlayOutTransaction) paramPacket;
             short transactionId = packet.getTransactionId();
 
+            transactionMap.put(transactionId, System.currentTimeMillis());
+
             this.lastTransactionId = transactionId;
         } else if (paramPacket instanceof WrappedPacketPlayInTransaction) {
             WrappedPacketPlayInTransaction packet = (WrappedPacketPlayInTransaction) paramPacket;
 
+            short id = packet.getTransactionId();
+
+            Long sentTime = transactionMap.get(id);
+            if (sentTime == null) { //the player is sending transactions that were never sent by the server
+                return;
+            }
+
+            long timeElapsed = System.currentTimeMillis() - sentTime;
+
+            this.transactionMap.remove(id);
+            this.lastPing = timeElapsed;
         }
     }
 }
