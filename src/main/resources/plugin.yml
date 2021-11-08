@@ -1,0 +1,7 @@
+main: cafe.mercury.anticheat.AntiCheat
+name: Mercury
+version: 1.0.0
+author: Gardening_Tool
+description: An advanced AntiCheat solution
+load: POSTWORLD
+depend: [ProtocolLib]

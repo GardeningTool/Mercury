@@ -1,6 +1,9 @@
 *.class
 *.xml
 *.iml
-.idea/
+
 out/
-server/
+target/
+build/
+.idea/
+.gradle/
