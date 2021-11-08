@@ -31,6 +31,8 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.22'
     compileOnly 'org.github.spigot:1.8.8:1.8.8'
     compileOnly 'com.comphenix.protocol:ProtocolLib:4.7.0'
+
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
 }
 
 group = 'cafe.mercury'
