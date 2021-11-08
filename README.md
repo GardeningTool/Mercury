@@ -1,7 +1,7 @@
 # Mercury
 An opensource &amp; featureful AntiCheat base
 
-##Authors
+## Authors
 
 - Gardening_Tool (George)
 - Numzskull (Vaziak)
