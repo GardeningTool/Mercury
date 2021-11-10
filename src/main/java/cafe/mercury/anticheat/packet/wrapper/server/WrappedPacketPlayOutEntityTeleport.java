@@ -9,20 +9,21 @@ import lombok.Getter;
 public class WrappedPacketPlayOutEntityTeleport extends WrappedPacket {
 
     private final int entityId;
-    private final byte posX;
-    private final byte posY;
-    private final byte posZ;
+    private final int posX;
+    private final int posY;
+    private final int posZ;
     private final byte yaw;
     private final byte pitch;
 
     public WrappedPacketPlayOutEntityTeleport(PacketContainer packetContainer) {
         StructureModifier<Byte> bytes = packetContainer.getBytes();
+        StructureModifier<Integer> integers = packetContainer.getIntegers();
 
-        this.entityId = packetContainer.getIntegers().read(0);
-        this.posX = bytes.read(0);
-        this.posY = bytes.read(1);
-        this.posZ = bytes.read(2);
-        this.yaw = bytes.read(3);
-        this.pitch = bytes.read(4);
+        this.entityId = integers.read(0);
+        this.posX = integers.read(0);
+        this.posY = integers.read(1);
+        this.posZ = integers.read(2);
+        this.yaw = bytes.read(0);
+        this.pitch = bytes.read(1);
     }
 }
