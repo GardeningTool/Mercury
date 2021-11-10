@@ -70,8 +70,8 @@ public class MovementTracker extends Tracker {
             CustomLocation location = new CustomLocation(posX, posY, posZ, yaw, pitch, packet.isOnGround());
 
             /*
-            If the list sof teleport locations contains the player's current position,
-            they will be exempted by checks.
+            If the list of teleport locations contains the player's current
+            position update, checks will properly compensate for the teleport.
              */
 
             Vector vec = new Vector(posX, posY, posZ);
