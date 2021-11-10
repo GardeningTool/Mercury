@@ -12,7 +12,7 @@ import cafe.mercury.anticheat.violation.handler.ViolationHandler;
 @CheckData(
         name = "Speed",
         type = "A",
-        description = "Checks if friction is being followed"
+        description = "Checks if friction is being applied properly"
 )
 public class SpeedA extends PositionUpdateCheck {
 
@@ -42,6 +42,6 @@ public class SpeedA extends PositionUpdateCheck {
             fail(new Violation("ratio", ratio));
         }
 
-        this.lastOffsetH = offsetH;
+        this.lastOffsetH = offsetH * collisionTracker.getCollisions().getFrictionFactor();
     }
 }
