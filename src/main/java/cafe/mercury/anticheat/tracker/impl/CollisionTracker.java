@@ -27,7 +27,7 @@ public class CollisionTracker extends Tracker {
     private static final List<Integer> CLIMBABLE = Arrays.asList(65, 106);
     private static final List<Integer> WATER = Arrays.asList(8, 9);
     private static final List<Integer> LAVA = Arrays.asList(10, 11);
-    private static final Map<Integer, Float> MODIFIED_FRICTION = ImmutableMap.of(
+    private static final Map<Integer, Float> ABNORMAL_FRICTION = ImmutableMap.of(
             Material.ICE.getId(), 0.98F,
             Material.PACKED_ICE.getId(), 0.98F,
             Material.SLIME_BLOCK.getId(), 0.8F
@@ -171,8 +171,8 @@ public class CollisionTracker extends Tracker {
     }
 
     private float getFrictionFactor(World world, CustomLocation location) {
-        return MODIFIED_FRICTION.getOrDefault(new Location(world, Math.floor(location.getX()),
-                Math.floor(location.getY()), Math.floor(location.getZ())).getBlock().getType().getId(), 0.6F) * 0.91F;
+        return ABNORMAL_FRICTION.getOrDefault(new Location(world, Math.floor(location.getX()),
+                Math.floor(location.getY() - 1), Math.floor(location.getZ())).getBlock().getType().getId(), 0.6F) * 0.91F;
     }
 
     @Getter @AllArgsConstructor
