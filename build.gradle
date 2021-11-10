@@ -1,10 +1,12 @@
 plugins {
     id 'java'
     id 'maven-publish'
+    id "com.github.johnrengelman.shadow" version "7.0.0"
 }
 
 repositories {
-    mavenLocal()
+    mavenLocal();
+
     maven {
         url = uri('https://jitpack.io')
     }
@@ -24,10 +26,22 @@ repositories {
     maven {
         url = uri('https://repo.maven.apache.org/maven2/')
     }
+
+    mavenCentral();
+}
+
+java.sourceCompatibility = JavaVersion.VERSION_1_8
+java.targetCompatibility = JavaVersion.VERSION_1_8
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
 }
 
 dependencies {
+
     implementation 'dev.thomazz:pledge:1.0-SNAPSHOT'
+
+    compileOnly 'org.projectlombok:lombok:1.18.22'
     compileOnly 'org.projectlombok:lombok:1.18.22'
     compileOnly 'org.github.spigot:1.8.8:1.8.8'
     compileOnly 'com.comphenix.protocol:ProtocolLib:4.7.0'
@@ -35,19 +49,14 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
 }
 
-group = 'cafe.mercury'
-version = '1.0.0'
-description = 'Mercury'
-java.sourceCompatibility = JavaVersion.VERSION_1_8
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            from(components.java)
-        }
-    }
+shadowJar {
+    minimize()
 }
 
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
+compileJava {
+    options.compilerArgs += ["-parameters"]
+    options.fork = true
+    options.forkOptions.executable = 'javac'
 }
+
+build.dependsOn shadowJar

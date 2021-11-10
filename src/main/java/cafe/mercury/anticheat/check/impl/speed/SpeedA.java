@@ -41,5 +41,7 @@ public class SpeedA extends PositionUpdateCheck {
         if (ratio > 1 && !movementTracker.isTeleporting()) {
             fail(new Violation("ratio", ratio));
         }
+
+        this.lastOffsetH = offsetH;
     }
 }

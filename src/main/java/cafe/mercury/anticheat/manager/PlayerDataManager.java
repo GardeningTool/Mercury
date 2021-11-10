@@ -3,7 +3,6 @@ package cafe.mercury.anticheat.manager;
 import cafe.mercury.anticheat.data.PlayerData;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.WeakHashMap;

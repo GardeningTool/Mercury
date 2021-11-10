@@ -33,8 +33,6 @@ public class CollisionTracker extends Tracker {
             Material.SLIME_BLOCK.getId(), 0.8F
     );
 
-    private final MovementTracker movementTracker = data.getMovementTracker();
-
     private CollisionResult previousCollisions = new CollisionResult();
     private CollisionResult collisions = new CollisionResult();
 
@@ -65,8 +63,8 @@ public class CollisionTracker extends Tracker {
 
     @Override
     public void handle(WrappedPacket paramPacket) {
-        if (paramPacket instanceof WrappedPacketPlayInFlying && !movementTracker.isSmallMove()) {
-            CustomLocation location = movementTracker.getCurrentLocation();
+        if (paramPacket instanceof WrappedPacketPlayInFlying && !data.getMovementTracker().isSmallMove()) {
+            CustomLocation location = data.getMovementTracker().getCurrentLocation();
             AxisAlignedBB boundingBox = location.toBoundingBox();
 
             Set<Collision> collisions = getCollidingBoundingBoxes(data.getPlayer().getWorld(), boundingBox);

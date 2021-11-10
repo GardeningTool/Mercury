@@ -30,13 +30,13 @@ public class PlayerData {
     public PlayerData(Player player) {
         this.player = player;
 
-        this.checks.addAll(Mercury.getInstance().getCheckManager().getChecks(this));
-
         this.actionTracker = new ActionTracker(this);
         this.collisionTracker = new CollisionTracker(this);
         this.movementTracker = new MovementTracker(this);
         this.pingTracker = new PingTracker(this);
         this.potionTracker = new PotionTracker(this);
+
+        this.checks.addAll(Mercury.getInstance().getCheckManager().getChecks(this));
     }
 
     public void handle(WrappedPacket wrappedPacket) {

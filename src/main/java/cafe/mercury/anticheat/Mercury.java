@@ -23,7 +23,7 @@ public class Mercury extends JavaPlugin {
     public void onEnable() {
         instance = this;
 
-        this.pledge = new PledgeImpl().range(Short.MIN_VALUE, (short) 0);
+        this.pledge = Pledge.build().range(Short.MIN_VALUE, (short) 0);
         this.pledge.start(this);
 
         ProtocolLibrary.getProtocolManager().addPacketListener(new PacketHandler(this));

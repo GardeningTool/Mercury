@@ -25,12 +25,12 @@ public class ViolationHandler {
     public void handleViolation(PlayerData playerData, CheckData checkData, Violation violation) {
         if (++vl >= maxViolations) {
             Bukkit.getScheduler().runTask(Mercury.getInstance(), () -> {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), String.format(BAN_COMMAND, playerData.getPlayer().getName()));
+//                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), String.format(BAN_COMMAND, playerData.getPlayer().getName()));
             });
         }
 
         TextComponent textComponent = new TextComponent();
-        StringBuilder textBuilder = new StringBuilder("&7[&c❑&7] &c");
+        StringBuilder textBuilder = new StringBuilder("&7[&c*&7] &c");
 
         textBuilder.append(playerData.getPlayer().getName()).append(" &7failed &c")
                 .append(checkData.name()).append(" Check ").append(checkData.type());

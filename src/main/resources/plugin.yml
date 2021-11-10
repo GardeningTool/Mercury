@@ -1,4 +1,4 @@
-main: cafe.mercury.anticheat.AntiCheat
+main: cafe.mercury.anticheat.Mercury
 name: Mercury
 version: 1.0.0
 author: Gardening_Tool
