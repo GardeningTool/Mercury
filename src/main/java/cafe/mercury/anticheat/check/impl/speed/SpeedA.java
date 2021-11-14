@@ -6,8 +6,10 @@ import cafe.mercury.anticheat.data.PlayerData;
 import cafe.mercury.anticheat.event.PositionUpdateEvent;
 import cafe.mercury.anticheat.tracker.impl.CollisionTracker;
 import cafe.mercury.anticheat.tracker.impl.MovementTracker;
+import cafe.mercury.anticheat.util.collision.CollisionResult;
 import cafe.mercury.anticheat.violation.Violation;
 import cafe.mercury.anticheat.violation.handler.ViolationHandler;
+import org.bukkit.Bukkit;
 
 @CheckData(
         name = "Speed",
@@ -32,7 +34,9 @@ public class SpeedA extends PositionUpdateCheck {
         double offsetH = event.getOffsetH();
         double aiMoveSpeed = movementTracker.getAiMoveSpeed();
 
-        if (!collisionTracker.getCollisions().isOnGround() && event.getOffsetV() > 0.2) {
+        CollisionResult collisions = collisionTracker.getCollisions();
+
+        if (event.getOffsetV() > 0.2 && event.getOffsetV() < .42F || collisions.isCollidedVertically()) {
             aiMoveSpeed += 0.2;
         }
 
@@ -42,6 +46,7 @@ public class SpeedA extends PositionUpdateCheck {
             fail(new Violation("ratio", ratio));
         }
 
-        this.lastOffsetH = offsetH * collisionTracker.getCollisions().getFrictionFactor();
+        debug("friction=%f ground=%b", collisions.getFrictionFactor(), collisions.isOnGround());
+        this.lastOffsetH = offsetH * collisions.getFrictionFactor();
     }
 }

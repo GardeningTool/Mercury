@@ -5,6 +5,8 @@ import cafe.mercury.anticheat.check.annotation.CheckData;
 import cafe.mercury.anticheat.data.PlayerData;
 import cafe.mercury.anticheat.violation.Violation;
 import cafe.mercury.anticheat.violation.handler.ViolationHandler;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 
 public abstract class Check<T> {
 
@@ -25,6 +27,10 @@ public abstract class Check<T> {
         this.checkData = clazz.getDeclaredAnnotation(CheckData.class);
         this.violationHandler = violationHandler;
         this.data = playerData;
+    }
+
+    public void debug(String info, Object... formatted) {
+        Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', String.format(info, formatted)));
     }
 
     public abstract void handle(T event);

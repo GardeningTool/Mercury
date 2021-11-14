@@ -5,14 +5,10 @@ import cafe.mercury.anticheat.data.PlayerData;
 import cafe.mercury.anticheat.manager.PlayerDataManager;
 import cafe.mercury.anticheat.packet.ClassWrapper;
 import cafe.mercury.anticheat.packet.wrapper.WrappedPacket;
-import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
-import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
-import org.bukkit.entity.Player;
-
-import javax.annotation.Nonnull;
+import org.bukkit.Bukkit;
 
 public class PacketHandler extends PacketAdapter {
 
@@ -29,7 +25,7 @@ public class PacketHandler extends PacketAdapter {
         PlayerData data = playerDataManager.getData(event.getPlayer());
         WrappedPacket wrappedPacket = ClassWrapper.wrapPacket(event.getPacketType(), event.getPacket());
 
-        data.handle(wrappedPacket);
+        handle(data, wrappedPacket);
     }
 
     @Override
@@ -37,6 +33,10 @@ public class PacketHandler extends PacketAdapter {
         PlayerData data = playerDataManager.getData(event.getPlayer());
         WrappedPacket wrappedPacket = ClassWrapper.wrapPacket(event.getPacketType(), event.getPacket());
 
+        handle(data, wrappedPacket);
+    }
+
+    public void handle(PlayerData data, WrappedPacket wrappedPacket) {
         data.handle(wrappedPacket);
     }
 

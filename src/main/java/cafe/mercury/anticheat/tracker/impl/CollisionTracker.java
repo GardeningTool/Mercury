@@ -11,6 +11,7 @@ import cafe.mercury.anticheat.util.mcp.MathHelper;
 import com.google.common.collect.ImmutableMap;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -53,7 +54,6 @@ public class CollisionTracker extends Tracker {
         BOUNDING_BOXES[Material.BREWING_STAND.getId()] = AxisAlignedBB.fromBounds(0, 0, 0, 1, 0.875, 1);
         BOUNDING_BOXES[Material.TRIPWIRE.getId()] = AxisAlignedBB.fromBounds(0, 0, 0, 1.0, 0.15625, 1);
         BOUNDING_BOXES[Material.SKULL.getId()] = AxisAlignedBB.fromBounds(0.25, 0, 0.25, 0.75, 0.5, 0.75);
-        BOUNDING_BOXES[Material.SIGN.getId()] = AxisAlignedBB.fromBounds(0.5 - 25, 0, .5F - .25, 0.5 + .25, 1, 0.5 + 1);
         BOUNDING_BOXES[Material.WATER_LILY.getId()] = AxisAlignedBB.fromBounds(0, 0., 0, 1, 0.015625, 1);
     }
 
@@ -63,36 +63,36 @@ public class CollisionTracker extends Tracker {
 
     @Override
     public void handle(WrappedPacket paramPacket) {
-        if (paramPacket instanceof WrappedPacketPlayInFlying && !data.getMovementTracker().isSmallMove()) {
+        if (paramPacket instanceof WrappedPacketPlayInFlying) {
             CustomLocation location = data.getMovementTracker().getCurrentLocation();
-            AxisAlignedBB boundingBox = location.toBoundingBox();
+            AxisAlignedBB boundingBox = location.toBoundingBox().expand(0.001, 0.001, 0.001);
 
             Set<Collision> collisions = getCollidingBoundingBoxes(data.getPlayer().getWorld(), boundingBox);
+
             Set<AxisAlignedBB> collisionBoxes = collisions.stream()
                     .map(Collision::getCollidingBox)
+                    .filter(box -> isCollided(box, boundingBox))
                     .collect(Collectors.toSet());
 
             CollisionResult result = new CollisionResult();
 
+            result.setOnGround(isCollidedBelow(collisionBoxes, location.getY()));
+            result.setFrictionFactor(result.isOnGround() ? getFrictionFactor(data.getPlayer().getWorld(), location) : .91F);
             result.setClimbing(collides(collisions, CLIMBABLE));
             result.setCollidedHorizontally(collisions.size() > 0);
             result.setUnderBlock(isCollidedAbove(collisionBoxes, boundingBox.maxY));
-            result.setOnGround(isCollidedBelow(collisionBoxes, boundingBox.minY));
             result.setInCobweb(collides(collisions, Material.WEB.getId()));
             result.setCollidedVertically(result.isOnGround() || result.isUnderBlock());
             result.setInLava(collides(collisions, LAVA));
             result.setInWater(collides(collisions, WATER));
-            result.setFrictionFactor(result.isOnGround() ? getFrictionFactor(data.getPlayer().getWorld(), location) : .91F);
 
             this.previousCollisions = this.collisions;
             this.collisions = result;
         }
     }
 
-    private Set<Collision> getCollidingBoundingBoxes(World world, AxisAlignedBB player) {
+    private Set<Collision> getCollidingBoundingBoxes(World world, AxisAlignedBB boundingBox) {
         Set<Collision> bbs = new HashSet<>();
-
-        AxisAlignedBB boundingBox = player.expand(0.1, 0.1, 0.1);
 
         int minX = MathHelper.floor_double(boundingBox.minX);
         int maxX = MathHelper.floor_double(boundingBox.maxX);
@@ -103,13 +103,12 @@ public class CollisionTracker extends Tracker {
 
         for (int x = minX; x <= maxX; ++x) {
             for (int z = minZ; z <= maxZ; ++z) {
-                if (!world.isChunkLoaded(x, z)) {
+                if (!world.isChunkLoaded(x >> 4, z >> 4)) {
                     continue;
                 }
 
                 for(int y = minY - 1; y < maxY; y++) {
-                    Location blockPosition = new Location(world, x, y, z);
-                    Block block = world.getBlockAt(blockPosition);
+                    Block block = world.getBlockAt(new Location(world, x, y, z));
 
                     int id = block.getType().getId();
                     AxisAlignedBB bb = BOUNDING_BOXES[id];
@@ -150,7 +149,7 @@ public class CollisionTracker extends Tracker {
      * @param targetY The y to check
      * @return If above below
      */
-    public static boolean isCollidedAbove(Set<AxisAlignedBB> bbs, double targetY) {
+    public boolean isCollidedAbove(Set<AxisAlignedBB> bbs, double targetY) {
         return bbs.stream()
                 .anyMatch(b -> b.maxY >= targetY);
     }
@@ -161,18 +160,33 @@ public class CollisionTracker extends Tracker {
      * @param targetY The y to check
      * @return If collided below
      */
-    public static boolean isCollidedBelow(Set<AxisAlignedBB> bbs, double targetY) {
+    public boolean isCollidedBelow(Set<AxisAlignedBB> bbs, double targetY) {
         return bbs.stream()
                 /*
                  * Since our bounding box system isn't perfect we have to check the minY and see if it's less than
                  * our target y
                  */
-                .anyMatch(b -> b.minY <= targetY);
+                .anyMatch(b -> b.minY < targetY);
+    }
+
+    /**
+     * Checks if {@param from} is collided with {@param to}
+     * @param from The from bounding box
+     * @param to The to bounding box
+     * @return If 2 bbs collide
+     */
+    public boolean isCollided(AxisAlignedBB from, AxisAlignedBB to) {
+        return from.minX <= to.maxX && from.maxX >= to.minY &&
+                from.minY <= to.maxY && from.maxY >= to.minY &&
+                from.minZ <= to.maxZ && from.maxZ >= to.minZ;
     }
 
     private float getFrictionFactor(World world, CustomLocation location) {
-        return ABNORMAL_FRICTION.getOrDefault(new Location(world, Math.floor(location.getX()),
-                Math.floor(location.getY() - 1), Math.floor(location.getZ())).getBlock().getType().getId(), 0.6F) * 0.91F;
+        Location bukkitLocation = new Location(world, Math.floor(location.getX()),
+                Math.floor(location.getY() - 1), Math.floor(location.getZ()));
+        int id = bukkitLocation.getBlock().getType().getId();
+
+        return ABNORMAL_FRICTION.getOrDefault(id, 0.6F) * 0.91F;
     }
 
     @Getter @AllArgsConstructor

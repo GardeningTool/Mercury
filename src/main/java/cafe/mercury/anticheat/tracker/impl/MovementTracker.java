@@ -39,7 +39,7 @@ public class MovementTracker extends Tracker {
         if (paramPacket instanceof WrappedPacketPlayInFlying) {
             WrappedPacketPlayInFlying packet = (WrappedPacketPlayInFlying) paramPacket;
 
-            teleporting = false;
+            teleporting = smallMove = false;
 
             if (!packet.isMoving() && !packet.isRotating()) {
                 smallMove = true; //the client didn't send a position update either due to not moving or due to 0.03

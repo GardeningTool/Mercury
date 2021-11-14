@@ -11,9 +11,13 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Getter
 public class PlayerData {
+
+    private static final ExecutorService checkExecutor = Executors.newSingleThreadExecutor();
 
     private final List<Check<?>> checks = new ArrayList<>();
 
@@ -40,18 +44,20 @@ public class PlayerData {
     }
 
     public void handle(WrappedPacket wrappedPacket) {
-        this.actionTracker.handle(wrappedPacket);
-        this.collisionTracker.handle(wrappedPacket);
-        this.potionTracker.handle(wrappedPacket);
-        this.pingTracker.handle(wrappedPacket);
-        this.movementTracker.handle(wrappedPacket);
+        checkExecutor.execute(() -> {
+            this.actionTracker.handle(wrappedPacket);
+            this.collisionTracker.handle(wrappedPacket);
+            this.potionTracker.handle(wrappedPacket);
+            this.pingTracker.handle(wrappedPacket);
+            this.movementTracker.handle(wrappedPacket);
 
-        if (wrappedPacket instanceof WrappedPacketPlayInFlying) {
-            ++ticksExisted;
-        }
+            if (wrappedPacket instanceof WrappedPacketPlayInFlying) {
+                ++ticksExisted;
+            }
 
-        checks.stream()
-                .filter(check -> check instanceof PacketCheck)
-                .forEach(check -> ((PacketCheck) check).handle(wrappedPacket));
+            checks.stream()
+                    .filter(check -> check instanceof PacketCheck)
+                    .forEach(check -> ((PacketCheck) check).handle(wrappedPacket));
+        });
     }
 }
