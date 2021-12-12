@@ -25,6 +25,7 @@ public class PlayerData {
 
     private final ActionTracker actionTracker;
     private final CollisionTracker collisionTracker;
+    private final EntityTracker entityTracker;
     private final MovementTracker movementTracker;
     private final PingTracker pingTracker;
     private final PotionTracker potionTracker;
@@ -36,6 +37,7 @@ public class PlayerData {
 
         this.actionTracker = new ActionTracker(this);
         this.collisionTracker = new CollisionTracker(this);
+        this.entityTracker = new EntityTracker(this);
         this.movementTracker = new MovementTracker(this);
         this.pingTracker = new PingTracker(this);
         this.potionTracker = new PotionTracker(this);
@@ -47,6 +49,7 @@ public class PlayerData {
         checkExecutor.execute(() -> {
             this.actionTracker.handle(wrappedPacket);
             this.collisionTracker.handle(wrappedPacket);
+            this.entityTracker.handle(wrappedPacket);
             this.potionTracker.handle(wrappedPacket);
             this.pingTracker.handle(wrappedPacket);
             this.movementTracker.handle(wrappedPacket);

@@ -1,6 +1,5 @@
-package cafe.mercury.anticheat.util;
+package cafe.mercury.anticheat.util.collision;
 
-import cafe.mercury.anticheat.util.collision.CollisionResult;
 import cafe.mercury.anticheat.util.location.CustomLocation;
 import cafe.mercury.anticheat.util.mcp.AxisAlignedBB;
 import cafe.mercury.anticheat.util.mcp.MathHelper;
@@ -141,11 +140,8 @@ public class CollisionUtil {
      */
     public static boolean isCollidedBelow(Set<AxisAlignedBB> bbs, double targetY) {
         return bbs.stream()
-                /*
-                 * Since our bounding box system isn't perfect we have to check the minY and see if it's less than
-                 * our target y
-                 */
-                .anyMatch(b -> b.minY < targetY);
+                .map(boundingBox -> boundingBox.expand(0, 0.1, 0))
+                .anyMatch(bb -> bb.minY <= targetY);
     }
 
     /**

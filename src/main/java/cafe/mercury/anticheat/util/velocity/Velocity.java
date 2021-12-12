@@ -28,7 +28,7 @@ public class Velocity {
         this.completedTick = (int) (ticks + ((velocityH / 2 + 2) * 15));
     }
 
-    public boolean isCompleted( ){
+    public boolean isCompleted(){
         return completedTick != -1 && playerData.getTicksExisted() > completedTick;
     }
 

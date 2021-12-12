@@ -4,7 +4,7 @@ import cafe.mercury.anticheat.data.PlayerData;
 import cafe.mercury.anticheat.packet.wrapper.WrappedPacket;
 import cafe.mercury.anticheat.packet.wrapper.client.WrappedPacketPlayInFlying;
 import cafe.mercury.anticheat.tracker.Tracker;
-import cafe.mercury.anticheat.util.CollisionUtil;
+import cafe.mercury.anticheat.util.collision.CollisionUtil;
 import cafe.mercury.anticheat.util.collision.CollisionResult;
 import cafe.mercury.anticheat.util.location.CustomLocation;
 import cafe.mercury.anticheat.util.mcp.AxisAlignedBB;
@@ -35,6 +35,5 @@ public class CollisionTracker extends Tracker {
             this.collisions = result;
         }
     }
-
 
 }

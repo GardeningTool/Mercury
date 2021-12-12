@@ -47,6 +47,7 @@ public class SpeedA extends PositionUpdateCheck {
         }
 
         debug("friction=%f ground=%b", collisions.getFrictionFactor(), collisions.isOnGround());
+
         this.lastOffsetH = offsetH * collisions.getFrictionFactor();
     }
 }
