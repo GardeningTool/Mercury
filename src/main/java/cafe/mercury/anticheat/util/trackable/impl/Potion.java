@@ -1,11 +1,12 @@
-package cafe.mercury.anticheat.util.potion;
+package cafe.mercury.anticheat.util.trackable.impl;
 
 import cafe.mercury.anticheat.data.PlayerData;
+import cafe.mercury.anticheat.util.trackable.ITrackable;
 import lombok.Getter;
 import org.bukkit.potion.PotionEffectType;
 
 @Getter
-public class Potion {
+public class Potion implements ITrackable {
 
     private final PlayerData playerData;
     private final PotionEffectType potionEffectType;
@@ -23,11 +24,6 @@ public class Potion {
         this.transactionId = transactionId;
     }
 
-    public boolean isActive() {
-        int ticksExisted = playerData.getTicksExisted();
-        return ticksExisted >= startTick && ticksExisted < endTick;
-    }
-
     public void start() {
         int tick = playerData.getTicksExisted();
 
@@ -35,7 +31,7 @@ public class Potion {
         this.endTick = tick + (duration * 20);
     }
 
-    public boolean hasCompleted() {
+    public boolean isCompleted() {
         return endTick > -1 && playerData.getTicksExisted() > endTick;
     }
 

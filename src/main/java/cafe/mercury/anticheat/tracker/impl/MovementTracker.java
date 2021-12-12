@@ -6,12 +6,15 @@ import cafe.mercury.anticheat.event.PositionUpdateEvent;
 import cafe.mercury.anticheat.packet.wrapper.WrappedPacket;
 import cafe.mercury.anticheat.packet.wrapper.client.WrappedPacketPlayInFlying;
 import cafe.mercury.anticheat.packet.wrapper.client.WrappedPacketPlayInTransaction;
+import cafe.mercury.anticheat.packet.wrapper.server.WrappedPacketPlayOutAbilities;
 import cafe.mercury.anticheat.packet.wrapper.server.WrappedPacketPlayOutEntityVelocity;
 import cafe.mercury.anticheat.packet.wrapper.server.WrappedPacketPlayOutPosition;
 import cafe.mercury.anticheat.tracker.Tracker;
 import cafe.mercury.anticheat.util.location.CustomLocation;
-import cafe.mercury.anticheat.util.velocity.Velocity;
+import cafe.mercury.anticheat.util.trackable.impl.Abilities;
+import cafe.mercury.anticheat.util.trackable.impl.Velocity;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -21,14 +24,22 @@ import java.util.List;
 public class MovementTracker extends Tracker {
 
     private final CollisionTracker collisionTracker = data.getCollisionTracker();
+
     private final List<Vector> teleports = new ArrayList<>();
     private final List<Velocity> velocities = new ArrayList<>();
+    private final List<Abilities> abilities = new ArrayList<>();
 
     private CustomLocation previousLocation = new CustomLocation(0, 0, 0);
     private CustomLocation currentLocation = new CustomLocation(0, 0, 0);
 
     private boolean teleporting, smallMove;
     private double aiMoveSpeed;
+
+    private double moveSpeed;
+    private double flySpeed;
+
+    private boolean isFlying;
+    private boolean canFly;
 
     public MovementTracker(PlayerData playerData) {
         super(playerData);
@@ -121,6 +132,11 @@ public class MovementTracker extends Tracker {
             Velocity velocity = new Velocity(data, lastSentTransaction, x, y, z);
 
             velocities.add(velocity);
+        } else if (paramPacket instanceof WrappedPacketPlayOutAbilities) {
+            WrappedPacketPlayOutAbilities packet = (WrappedPacketPlayOutAbilities) paramPacket;
+
+            Abilities packetAbilities = new Abilities(data, packet.isCanFly(), packet.isFlying(), packet.getFlySpeed(),  packet.getWalkSpeed());
+            abilities.add(packetAbilities);
         } else if (paramPacket instanceof WrappedPacketPlayInTransaction) {
             WrappedPacketPlayInTransaction packet = (WrappedPacketPlayInTransaction) paramPacket;
 
@@ -129,6 +145,17 @@ public class MovementTracker extends Tracker {
             velocities.stream()
                     .filter(velocity -> velocity.getTransaction() == id)
                     .forEach(Velocity::start);
+
+            for(Abilities abilities : abilities) {
+                if (abilities.getStartTick() != id) {
+                    continue;
+                }
+
+                this.moveSpeed = abilities.getMoveSpeed();
+                this.flySpeed = abilities.getFlySpeed();
+                this.isFlying = abilities.isFlying();
+                this.canFly = abilities.isCanFly();
+            }
         }
     }
 

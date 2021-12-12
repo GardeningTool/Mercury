@@ -53,6 +53,7 @@ public class ClassWrapper {
         PACKET_MAP.put(PacketType.Play.Server.REL_ENTITY_MOVE, getConstructor(WrappedPacketPlayOutRelMove.class));
         PACKET_MAP.put(PacketType.Play.Server.REMOVE_ENTITY_EFFECT, getConstructor(WrappedPacketPlayOutRemoveEntityEffect.class));
         PACKET_MAP.put(PacketType.Play.Server.TRANSACTION, getConstructor(WrappedPacketPlayOutTransaction.class));
+        PACKET_MAP.put(PacketType.Play.Server.ABILITIES, getConstructor(WrappedPacketPlayOutAbilities.class));
     }
 
     @SneakyThrows

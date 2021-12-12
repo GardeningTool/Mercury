@@ -7,7 +7,7 @@ import cafe.mercury.anticheat.packet.wrapper.client.WrappedPacketPlayInTransacti
 import cafe.mercury.anticheat.packet.wrapper.server.WrappedPacketPlayOutEntityEffect;
 import cafe.mercury.anticheat.packet.wrapper.server.WrappedPacketPlayOutRemoveEntityEffect;
 import cafe.mercury.anticheat.tracker.Tracker;
-import cafe.mercury.anticheat.util.potion.Potion;
+import cafe.mercury.anticheat.util.trackable.impl.Potion;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
@@ -61,7 +61,7 @@ public class PotionTracker extends Tracker {
 
             pendingPotions.removeIf(activePotions::contains);
         } else if (paramPacket instanceof WrappedPacketPlayInFlying) {
-            activePotions.removeIf(Potion::hasCompleted);
+            activePotions.removeIf(Potion::isCompleted);
         } else if (paramPacket instanceof WrappedPacketPlayOutRemoveEntityEffect) {
             WrappedPacketPlayOutRemoveEntityEffect packet = (WrappedPacketPlayOutRemoveEntityEffect) paramPacket;
 

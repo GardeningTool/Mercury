@@ -1,11 +1,12 @@
-package cafe.mercury.anticheat.util.velocity;
+package cafe.mercury.anticheat.util.trackable.impl;
 
 import cafe.mercury.anticheat.data.PlayerData;
 import cafe.mercury.anticheat.util.math.MathUtil;
+import cafe.mercury.anticheat.util.trackable.ITrackable;
 import lombok.Getter;
 
 @Getter
-public class Velocity {
+public class Velocity implements ITrackable {
 
     private final double velocityH;
     private final double velocityV;
@@ -21,6 +22,7 @@ public class Velocity {
         this.transaction = transaction;
     }
 
+    @Override
     public void start() {
         int ticks = playerData.getTicksExisted();
 
@@ -28,6 +30,7 @@ public class Velocity {
         this.completedTick = (int) (ticks + ((velocityH / 2 + 2) * 15));
     }
 
+    @Override
     public boolean isCompleted(){
         return completedTick != -1 && playerData.getTicksExisted() > completedTick;
     }
