@@ -151,7 +151,7 @@ public class CollisionUtil {
      * @return If 2 bbs collide
      */
     public static boolean isCollided(AxisAlignedBB from, AxisAlignedBB to) {
-        return from.minX <= to.maxX && from.maxX >= to.minY &&
+        return from.minX <= to.maxX && from.maxX >= to.minX &&
                 from.minY <= to.maxY && from.maxY >= to.minY &&
                 from.minZ <= to.maxZ && from.maxZ >= to.minZ;
     }
