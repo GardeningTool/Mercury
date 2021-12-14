@@ -31,8 +31,13 @@ public class PacketHandler extends PacketAdapter {
     @Override
     public void onPacketSending(PacketEvent event) {
         PlayerData data = playerDataManager.getData(event.getPlayer());
-        WrappedPacket wrappedPacket = ClassWrapper.wrapPacket(event.getPacketType(), event.getPacket());
 
+        if (event.isPlayerTemporary()) {
+            return;
+        }
+
+        WrappedPacket wrappedPacket = ClassWrapper.wrapPacket(event.getPacketType(), event.getPacket());
+        
         handle(data, wrappedPacket);
     }
 
