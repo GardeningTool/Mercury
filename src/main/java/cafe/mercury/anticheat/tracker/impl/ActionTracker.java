@@ -2,10 +2,7 @@ package cafe.mercury.anticheat.tracker.impl;
 
 import cafe.mercury.anticheat.data.PlayerData;
 import cafe.mercury.anticheat.packet.wrapper.WrappedPacket;
-import cafe.mercury.anticheat.packet.wrapper.client.WrappedPacketPlayInBlockDig;
-import cafe.mercury.anticheat.packet.wrapper.client.WrappedPacketPlayInBlockPlace;
-import cafe.mercury.anticheat.packet.wrapper.client.WrappedPacketPlayInFlying;
-import cafe.mercury.anticheat.packet.wrapper.client.WrappedPacketPlayInUseEntity;
+import cafe.mercury.anticheat.packet.wrapper.client.*;
 import cafe.mercury.anticheat.tracker.Tracker;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import lombok.Getter;
@@ -16,6 +13,7 @@ public class ActionTracker extends Tracker {
     private boolean digging;
     private boolean placing;
     private boolean attacking;
+    private boolean sneaking;
 
     public ActionTracker(PlayerData playerData) {
         super(playerData);
@@ -33,6 +31,14 @@ public class ActionTracker extends Tracker {
                 case STOP_DESTROY_BLOCK:
                     digging = false;
                     break;
+            }
+        } else if (paramPacket instanceof WrappedPacketPlayInEntityAction) {
+            WrappedPacketPlayInEntityAction packet = (WrappedPacketPlayInEntityAction) paramPacket;
+
+            if (packet.getAction() == EnumWrappers.PlayerAction.START_SNEAKING) {
+                sneaking = true;
+            } else if (packet.getAction() == EnumWrappers.PlayerAction.STOP_SNEAKING) {
+                sneaking = false;
             }
         } else if (paramPacket instanceof WrappedPacketPlayInUseEntity) {
             WrappedPacketPlayInUseEntity packet = (WrappedPacketPlayInUseEntity) paramPacket;
