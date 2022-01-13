@@ -38,9 +38,9 @@ public class PlayerData {
         this.actionTracker = new ActionTracker(this);
         this.collisionTracker = new CollisionTracker(this);
         this.entityTracker = new EntityTracker(this);
+        this.potionTracker = new PotionTracker(this);
         this.movementTracker = new MovementTracker(this);
         this.pingTracker = new PingTracker(this);
-        this.potionTracker = new PotionTracker(this);
 
         this.checks.addAll(Mercury.getInstance().getCheckManager().getChecks(this));
     }

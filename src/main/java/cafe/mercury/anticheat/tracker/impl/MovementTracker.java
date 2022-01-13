@@ -15,6 +15,7 @@ import cafe.mercury.anticheat.util.trackable.impl.Abilities;
 import cafe.mercury.anticheat.util.trackable.impl.Velocity;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import java.util.List;
 public class MovementTracker extends Tracker {
 
     private final CollisionTracker collisionTracker = data.getCollisionTracker();
+    private final PotionTracker potionTracker = data.getPotionTracker();
 
     private final List<Vector> teleports = new ArrayList<>();
     private final List<Velocity> velocities = new ArrayList<>();
@@ -107,6 +109,13 @@ public class MovementTracker extends Tracker {
             } else {
                 aiMoveSpeed = 0.026;
             }
+
+            /**
+             * Since potion effects affect your movement speed,
+             * we have to modify our movement speed as well
+             */
+            aiMoveSpeed += (0.2 * potionTracker.getAmplifier(PotionEffectType.SPEED));
+            aiMoveSpeed -= (0.15 * potionTracker.getAmplifier(PotionEffectType.SLOW));
 
             PositionUpdateEvent event = new PositionUpdateEvent(location, currentLocation);
 

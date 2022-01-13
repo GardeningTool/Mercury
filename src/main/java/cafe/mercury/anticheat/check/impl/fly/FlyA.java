@@ -33,6 +33,7 @@ public class FlyA extends PositionUpdateCheck {
         super(playerData, new ViolationHandler(10));
     }
 
+    //TODO: Add slime detection
     @Override
     public void handle(PositionUpdateEvent event) {
         double offsetV = event.getOffsetV();
@@ -55,10 +56,10 @@ public class FlyA extends PositionUpdateCheck {
         boolean groundStateChange = false;
         if (collisionTracker.getPreviousCollisions().isMathematicallyOnGround()) {
             /*
-            * Whether or not the player was mathematically on the ground in their last movement packet,
-            * and was not mathematically on ground in this one
+            * Whether the player was mathematically on the ground in their last,
+            * movement packet and was not on ground in this one
             */
-            groundStateChange = collisionTracker.getCollisions().isMathematicallyOnGround();
+            groundStateChange = collisionTracker.getCollisions().isOnGround();
         }
 
         if (movementTracker.getVelocityV() > 0) {
@@ -80,8 +81,8 @@ public class FlyA extends PositionUpdateCheck {
                 maxOffsetV += JUMP_BLOCK_INCREASE;
             } else {
                 /*
-                 * When the player is collided with a block above them and they try to jump,
-                 * their jump height will decrease. Additionally, a number of other factors,
+                 * When the player is collided with a block above their head tries to jump,
+                 * they won't be able to jump as high. Additionally, a number of other factors,
                  * such as potion effects, will not be considered.
                  */
                 maxOffsetV = COLLIDED_OFFSET_V;
