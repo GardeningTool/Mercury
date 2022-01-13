@@ -27,6 +27,8 @@ public class FlyA extends PositionUpdateCheck {
     private final MovementTracker movementTracker = data.getMovementTracker();
     private final PotionTracker potionTracker = data.getPotionTracker();
 
+    private boolean lastOnGround;
+
     private double buffer;
 
     public FlyA(PlayerData playerData) {
@@ -54,12 +56,20 @@ public class FlyA extends PositionUpdateCheck {
         }
 
         boolean groundStateChange = false;
-        if (collisionTracker.getPreviousCollisions().isMathematicallyOnGround()) {
+        if (collisionTracker.getPreviousCollisions().isOnGround() && !lastOnGround) {
             /*
             * Whether the player was mathematically on the ground in their last,
-            * movement packet and was not on ground in this one
+            * movement packet and was not on ground in this one.
+            *
+            * We want to handle things using slightly different ground calculations,
+            * since if we had only used mathematical ground, the player would be able
+            * to increase their jump height to a value that meets the condition
             */
-            groundStateChange = collisionTracker.getCollisions().isOnGround();
+            if (offsetV > 0.5) {
+                groundStateChange = collisionTracker.getCollisions().isOnGround();
+            } else {
+                groundStateChange = collisionTracker.getCollisions().isMathematicallyOnGround();
+            }
         }
 
         if (movementTracker.getVelocityV() > 0) {
@@ -89,12 +99,16 @@ public class FlyA extends PositionUpdateCheck {
             }
         }
 
-        if (groundStateChange && offsetV > maxOffsetV) {
+        boolean smallHop = offsetV > 0.01 && Math.abs(offsetV - maxOffsetV) > 0.05;
+
+        if (groundStateChange && (offsetV > maxOffsetV || smallHop)) {
             if (++buffer > 3) {
                 fail(new Violation("offsetV", offsetV, "maxOffsetV", maxOffsetV));
             }
         } else if (groundStateChange) {
             buffer = Math.max(buffer - 0.3, 0);
         }
+
+        this.lastOnGround = collisionTracker.getPreviousCollisions().isMathematicallyOnGround();
     }
 }

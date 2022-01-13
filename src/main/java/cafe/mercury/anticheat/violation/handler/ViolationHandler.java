@@ -34,7 +34,7 @@ public class ViolationHandler {
 
         textBuilder.append(playerData.getPlayer().getName()).append(" &7failed &c")
                 .append(checkData.name()).append(" Check ").append(checkData.type())
-                .append(" &8(&7VL: ").append(violations).append("&8/").append(maxViolations).append("&7)");
+                .append(" &8(&7VL: ").append(violations).append("&8/").append(maxViolations).append(")");
 
         textComponent.setText(ChatColor.translateAlternateColorCodes('&', textBuilder.toString()));
 
