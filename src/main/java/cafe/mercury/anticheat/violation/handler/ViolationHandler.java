@@ -20,10 +20,10 @@ public class ViolationHandler {
     private static final String BAN_COMMAND = "ban %s Unfair Advantage -s";
 
     private final int maxViolations;
-    private int vl;
+    private int violations;
 
     public void handleViolation(PlayerData playerData, CheckData checkData, Violation violation) {
-        if (++vl >= maxViolations) {
+        if (++violations >= maxViolations) {
             Bukkit.getScheduler().runTask(Mercury.getInstance(), () -> {
 //                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), String.format(BAN_COMMAND, playerData.getPlayer().getName()));
             });
@@ -33,7 +33,8 @@ public class ViolationHandler {
         StringBuilder textBuilder = new StringBuilder("&7[&c*&7] &c");
 
         textBuilder.append(playerData.getPlayer().getName()).append(" &7failed &c")
-                .append(checkData.name()).append(" Check ").append(checkData.type());
+                .append(checkData.name()).append(" Check ").append(checkData.type())
+                .append(" &8(&7VL: ").append(violations).append("&8/").append(maxViolations).append("&7)");
 
         textComponent.setText(ChatColor.translateAlternateColorCodes('&', textBuilder.toString()));
 
@@ -55,9 +56,8 @@ public class ViolationHandler {
             hoverComponentBuilder.append("\n&bPing: &7").append(playerData.getPingTracker().getLastPing());
             hoverComponentBuilder.append("\n&7&l&m---------------------------------------&r");
 
-            BaseComponent[] hoverComponents = new ComponentBuilder(
-                    ChatColor.translateAlternateColorCodes('&', hoverComponentBuilder.toString()))
-                    .create();
+            BaseComponent[] hoverComponents = new ComponentBuilder(ChatColor.translateAlternateColorCodes('&',
+                    hoverComponentBuilder.toString())).create();
 
             textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverComponents));
         }

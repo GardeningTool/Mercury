@@ -2,6 +2,8 @@ package cafe.mercury.anticheat.manager;
 
 import cafe.mercury.anticheat.check.Check;
 import cafe.mercury.anticheat.check.impl.badpackets.BadPacketsA;
+import cafe.mercury.anticheat.check.impl.fly.FlyA;
+import cafe.mercury.anticheat.check.impl.reach.ReachA;
 import cafe.mercury.anticheat.check.impl.speed.SpeedA;
 import cafe.mercury.anticheat.data.PlayerData;
 
@@ -14,6 +16,10 @@ public class CheckManager {
 
     private static final List<Constructor<? extends Check<?>>> CHECK_CONSTRUCTORS = Stream.of(
             BadPacketsA.class,
+
+            FlyA.class,
+
+            ReachA.class,
 
             SpeedA.class
     ).map(clazz -> {

@@ -4,7 +4,6 @@ import cafe.mercury.anticheat.manager.CheckManager;
 import cafe.mercury.anticheat.manager.PlayerDataManager;
 import cafe.mercury.anticheat.packet.handler.PacketHandler;
 import com.comphenix.protocol.ProtocolLibrary;
-import dev.thomazz.pledge.PledgeImpl;
 import dev.thomazz.pledge.api.Pledge;
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;

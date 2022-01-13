@@ -7,6 +7,7 @@ import cafe.mercury.anticheat.packet.wrapper.server.*;
 import cafe.mercury.anticheat.tracker.Tracker;
 import cafe.mercury.anticheat.util.entity.TrackedData;
 import cafe.mercury.anticheat.util.location.CustomLocation;
+import org.bukkit.Bukkit;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,9 +37,10 @@ public class EntityTracker extends Tracker {
             CustomLocation customLocation = new CustomLocation(posX, posY, posZ, 0F, 0F, true);
 
             TrackedData trackedData = new TrackedData();
-            trackedData.addTarget(data.getPingTracker().getLastTransactionId(), customLocation);
+            trackedData.addTarget(data.getPingTracker().getLastTransactionId(), customLocation, true);
 
             entityTracker.put(packet.getEntityId(), trackedData);
+            Bukkit.broadcastMessage("spawned entity " + packet.getEntityId());
         } else if (paramPacket instanceof WrappedPacketPlayOutEntityTeleport) {
             WrappedPacketPlayOutEntityTeleport packet = (WrappedPacketPlayOutEntityTeleport) paramPacket;
 
@@ -51,9 +53,9 @@ public class EntityTracker extends Tracker {
             float pitch = packet.getPitch();
 
             CustomLocation customLocation = new CustomLocation(posX, posY, posZ, yaw, pitch, true);
-            TrackedData trackedData = entityTracker.get(id);
+            TrackedData trackedData = entityTracker.getOrDefault(id, new TrackedData());
 
-            trackedData.addTarget(data.getPingTracker().getLastTransactionId(), customLocation);
+            trackedData.addTarget(data.getPingTracker().getLastTransactionId(), customLocation, true);
             entityTracker.put(id, trackedData);
 
             this.lastPosX = posX;
@@ -100,9 +102,9 @@ public class EntityTracker extends Tracker {
             }
 
             CustomLocation location = new CustomLocation(posX, posY, posZ, yaw, pitch, true);
-            TrackedData trackedData = entityTracker.get(id);
+            TrackedData trackedData = entityTracker.getOrDefault(id, new TrackedData());
 
-            trackedData.addTarget(data.getPingTracker().getLastTransactionId(), location);
+            trackedData.addTarget(data.getPingTracker().getLastTransactionId(), location, false);
             entityTracker.put(id, trackedData);
         } else if (paramPacket instanceof WrappedPacketPlayInTransaction) {
             WrappedPacketPlayInTransaction transaction = (WrappedPacketPlayInTransaction) paramPacket;
@@ -120,10 +122,13 @@ public class EntityTracker extends Tracker {
     public CustomLocation getTrackedLocation(int entityId, short tick) {
         TrackedData data = entityTracker.get(entityId);
 
+        Bukkit.broadcastMessage("returning null? " + (data.getAtTick(tick) == null));
+
         if (data == null) {
             return null;
         }
 
         return data.getAtTick(tick);
     }
+
 }

@@ -22,8 +22,7 @@ public class SpeedA extends PositionUpdateCheck {
     private final MovementTracker movementTracker = data.getMovementTracker();
 
     private double lastOffsetH;
-
-    private int vl;
+    private double buffer;
 
     public SpeedA(PlayerData playerData) {
         super(playerData, new ViolationHandler(10));
@@ -34,20 +33,25 @@ public class SpeedA extends PositionUpdateCheck {
         double offsetH = event.getOffsetH();
         double aiMoveSpeed = movementTracker.getAiMoveSpeed();
 
-        CollisionResult collisions = collisionTracker.getCollisions();
-
-        if (event.getOffsetV() > 0.2 && event.getOffsetV() < .42F || collisions.isCollidedVertically()) {
-            aiMoveSpeed += 0.2;
-        }
-
+        /*
+         * We need to find the ratio at which the player is moving
+         * compared to their expected movement speed following Minecraft's
+         * logic and friction.
+         */
         double ratio = (offsetH - lastOffsetH) / aiMoveSpeed;
 
+        /*
+         * If they're moving faster than Minecraft says they should be,
+         * and we know they aren't teleporting, we can flag them for Speed
+         */
         if (ratio > 1 && !movementTracker.isTeleporting()) {
-            fail(new Violation("ratio", ratio));
+            if (++buffer > 5) {
+                fail(new Violation("ratio", ratio));
+            }
+        } else {
+            buffer = Math.max(buffer - 0.5, 0);
         }
 
-        debug("friction=%f ground=%b", collisions.getFrictionFactor(), collisions.isOnGround());
-
-        this.lastOffsetH = offsetH * collisions.getFrictionFactor();
+        this.lastOffsetH = offsetH * collisionTracker.getPreviousCollisions().getFrictionFactor();
     }
 }

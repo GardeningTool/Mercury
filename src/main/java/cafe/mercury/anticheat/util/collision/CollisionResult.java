@@ -6,6 +6,7 @@ import lombok.Setter;
 @Getter @Setter
 public class CollisionResult {
 
+    private boolean isMathematicallyOnGround;
     private boolean isClimbing;
     private boolean isInCobweb;
     private boolean isInLava;

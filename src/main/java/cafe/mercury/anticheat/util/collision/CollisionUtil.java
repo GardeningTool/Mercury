@@ -6,6 +6,7 @@ import cafe.mercury.anticheat.util.mcp.MathHelper;
 import com.google.common.collect.ImmutableMap;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -16,25 +17,35 @@ import java.util.stream.Collectors;
 
 public class CollisionUtil {
 
-    private static final int MATERIAL_MAX = Material.values().length;
-    private static final AxisAlignedBB[] BOUNDING_BOXES = new AxisAlignedBB[MATERIAL_MAX];
-    private static final List<Integer> CLIMBABLE = Arrays.asList(65, 106);
-    private static final List<Integer> WATER = Arrays.asList(8, 9);
-    private static final List<Integer> LAVA = Arrays.asList(10, 11);
-    private static final Map<Integer, Float> ABNORMAL_FRICTION = ImmutableMap.of(
+    /**
+     * We use this field as a divisor for the player's position on the Y axis.
+     * This will tell us if the player is mathematically on the ground.
+     */
+    private static final double DIVISOR = 1D / 64D;
+
+    private static final int MATERIAL_MAX = Material.values().length; //every material in minecraft
+    private static final AxisAlignedBB[] BOUNDING_BOXES = new AxisAlignedBB[MATERIAL_MAX]; //the corresponding bounding box sizes
+    private static final List<Integer> CLIMBABLE = Arrays.asList(65, 106); //vines and ladders
+    private static final List<Integer> WATER = Arrays.asList(8, 9); //water IDs
+    private static final List<Integer> LAVA = Arrays.asList(10, 11); //lava IDs
+    private static final Map<Integer, Float> ABNORMAL_FRICTION = ImmutableMap.of( //all blocks that have some form of irregular friction
             Material.ICE.getId(), 0.98F,
             Material.PACKED_ICE.getId(), 0.98F,
             Material.SLIME_BLOCK.getId(), 0.8F
     );
 
+    //TODO: Find an automated, NMS-independent way of doing this
     static {
         AxisAlignedBB fence = AxisAlignedBB.fromBounds(0, 0, 0, 1, 1.5, 1);
+        AxisAlignedBB defaultBb = AxisAlignedBB.fromBounds(0, 0, 0, 1, 1, 1);
 
         for(int i = 0; i < MATERIAL_MAX; i++) {
             Material material = Material.values()[i];
 
             if (material.name().contains("FENCE")) {
                 BOUNDING_BOXES[i] = fence;
+            } else {
+                BOUNDING_BOXES[i] = defaultBb;
             }
         }
 
@@ -56,7 +67,7 @@ public class CollisionUtil {
 
         CollisionResult result = new CollisionResult();
 
-        result.setOnGround(CollisionUtil.isCollidedBelow(collisionBoxes, location.getY()));
+        result.setOnGround(CollisionUtil.isCollidedBelow(collisionBoxes, MathHelper.floor_double(location.getY())));
         result.setFrictionFactor(result.isOnGround() ? CollisionUtil.getFrictionFactor(world, location) : .91F);
         result.setClimbing(collides(collisions, CLIMBABLE));
         result.setCollidedHorizontally(collisions.size() > 0);
@@ -65,6 +76,7 @@ public class CollisionUtil {
         result.setCollidedVertically(result.isOnGround() || result.isUnderBlock());
         result.setInLava(collides(collisions, LAVA));
         result.setInWater(collides(collisions, WATER));
+        result.setMathematicallyOnGround(location.getY() % DIVISOR == 0);
 
         return result;
     }
@@ -85,22 +97,17 @@ public class CollisionUtil {
                     continue;
                 }
 
-                for (int y = minY - 1; y < maxY; y++) {
+                for (int y = minY; y < maxY; y++) {
                     Block block = world.getBlockAt(new Location(world, x, y, z));
 
                     int id = block.getType().getId();
+                    if (id == Material.AIR.getId()) {
+                        continue;
+                    }
+                    
                     AxisAlignedBB bb = BOUNDING_BOXES[id];
 
-                    if (bb != null) {
-                        bb = bb.addCoord(x, y, z);
-                    } else {
-                        /*
-                         * We're just going to assume the block's bounding box
-                         * is this exact shape and size. Abnormal bounding boxes
-                         * are accounted for above
-                         */
-                        bb = new AxisAlignedBB(x - 0.5, y, z - 0.5, x + 0.5, y + 1, z + 0.5);
-                    }
+                    bb = bb.addCoord(x, y, z);
 
                     if (boundingBox.intersectsWith(bb)) {
                         bbs.add(new Collision(bb, id));
@@ -140,7 +147,6 @@ public class CollisionUtil {
      */
     public static boolean isCollidedBelow(Set<AxisAlignedBB> bbs, double targetY) {
         return bbs.stream()
-                .map(boundingBox -> boundingBox.expand(0, 0.1, 0))
                 .anyMatch(bb -> bb.minY <= targetY);
     }
 
