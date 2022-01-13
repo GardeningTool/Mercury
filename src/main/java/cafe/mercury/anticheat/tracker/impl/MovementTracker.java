@@ -96,21 +96,23 @@ public class MovementTracker extends Tracker {
 
             //Calculate the move speed
             if (collisionTracker.getCollisions().isOnGround()) {
-                double offsetV = location.getY() - currentLocation.getY();
                 float friction = collisionTracker.getPreviousCollisions().getFrictionFactor();
 
                 aiMoveSpeed = moveSpeed / 2;
                 aiMoveSpeed *= 1.3F; //sprint modifier
                 aiMoveSpeed *= .16277136F / Math.pow(friction, 3);
-
-                if (offsetV > 0.2F && offsetV < 0.42F || collisionTracker.getCollisions().isCollidedVertically()) {
-                    aiMoveSpeed += 0.2F;
-                }
             } else {
                 aiMoveSpeed = 0.026;
             }
 
-            /**
+            double offsetV = location.getY() - currentLocation.getY();
+            if (offsetV > 0.2F && offsetV < 0.42F || collisionTracker.getCollisions().isCollidedVertically()) {
+                aiMoveSpeed += 0.2F;
+            }
+
+            aiMoveSpeed += getVelocityH();
+
+            /*
              * Since potion effects affect your movement speed,
              * we have to modify our movement speed as well
              */

@@ -16,6 +16,7 @@ import org.bukkit.Bukkit;
         type = "A",
         description = "Checks if friction is being applied properly"
 )
+//TODO: Fix falses under blocks with ice
 public class SpeedA extends PositionUpdateCheck {
 
     private final CollisionTracker collisionTracker = data.getCollisionTracker();

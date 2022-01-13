@@ -99,7 +99,9 @@ public class FlyA extends PositionUpdateCheck {
             }
         }
 
-        boolean smallHop = offsetV > 0.03 && offsetV < 0.4 && Math.abs(offsetV - maxOffsetV) > 0.05;
+        //We want to only check if the jump size is too low when they aren't collided vertically
+        boolean smallHop = offsetV > 0.03 && offsetV < DEFAULT_JUMP_HEIGHT &&
+                Math.abs(offsetV - maxOffsetV) > 0.05 && maxOffsetV < 0.5;
 
         if (groundStateChange && (offsetV > maxOffsetV || smallHop)) {
             if (++buffer > 3) {
