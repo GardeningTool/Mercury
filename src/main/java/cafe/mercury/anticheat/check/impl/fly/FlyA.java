@@ -99,7 +99,7 @@ public class FlyA extends PositionUpdateCheck {
             }
         }
 
-        boolean smallHop = offsetV > 0.01 && offsetV < 0.4 && Math.abs(offsetV - maxOffsetV) > 0.05;
+        boolean smallHop = offsetV > 0.03 && offsetV < 0.4 && Math.abs(offsetV - maxOffsetV) > 0.05;
 
         if (groundStateChange && (offsetV > maxOffsetV || smallHop)) {
             if (++buffer > 3) {
