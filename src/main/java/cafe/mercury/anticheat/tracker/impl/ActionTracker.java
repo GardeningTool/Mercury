@@ -14,6 +14,7 @@ public class ActionTracker extends Tracker {
     private boolean placing;
     private boolean attacking;
     private boolean sneaking;
+    private boolean sprinting;
 
     public ActionTracker(PlayerData playerData) {
         super(playerData);
@@ -35,10 +36,23 @@ public class ActionTracker extends Tracker {
         } else if (paramPacket instanceof WrappedPacketPlayInEntityAction) {
             WrappedPacketPlayInEntityAction packet = (WrappedPacketPlayInEntityAction) paramPacket;
 
-            if (packet.getAction() == EnumWrappers.PlayerAction.START_SNEAKING) {
-                sneaking = true;
-            } else if (packet.getAction() == EnumWrappers.PlayerAction.STOP_SNEAKING) {
-                sneaking = false;
+            switch (packet.getAction()) {
+                case START_SNEAKING: {
+                    sneaking = true;
+                    break;
+                }
+                case STOP_SNEAKING: {
+                    sneaking = false;
+                    break;
+                }
+                case START_SPRINTING: {
+                    sprinting = true;
+                    break;
+                }
+                case STOP_SPRINTING: {
+                    sprinting = false;
+                    break;
+                }
             }
         } else if (paramPacket instanceof WrappedPacketPlayInUseEntity) {
             WrappedPacketPlayInUseEntity packet = (WrappedPacketPlayInUseEntity) paramPacket;

@@ -10,6 +10,7 @@ import cafe.mercury.anticheat.packet.wrapper.server.WrappedPacketPlayOutAbilitie
 import cafe.mercury.anticheat.packet.wrapper.server.WrappedPacketPlayOutEntityVelocity;
 import cafe.mercury.anticheat.packet.wrapper.server.WrappedPacketPlayOutPosition;
 import cafe.mercury.anticheat.tracker.Tracker;
+import cafe.mercury.anticheat.util.collision.CollisionResult;
 import cafe.mercury.anticheat.util.location.CustomLocation;
 import cafe.mercury.anticheat.util.trackable.impl.Abilities;
 import cafe.mercury.anticheat.util.trackable.impl.Velocity;
@@ -24,6 +25,7 @@ import java.util.List;
 @Getter
 public class MovementTracker extends Tracker {
 
+    private final ActionTracker actionTracker = data.getActionTracker();
     private final CollisionTracker collisionTracker = data.getCollisionTracker();
     private final PotionTracker potionTracker = data.getPotionTracker();
 
@@ -94,20 +96,26 @@ public class MovementTracker extends Tracker {
                 teleporting = true;
             }
 
-            //Calculate the move speed
-            if (collisionTracker.getPreviousCollisions().isOnGround()) {
-                float friction = collisionTracker.getPreviousCollisions().getFrictionFactor();
+            CollisionResult collisions = collisionTracker.getPreviousCollisions();
+            CollisionResult currentCollisions = collisionTracker.getCollisions();
 
+            double offsetV = location.getY() - currentLocation.getY();
+
+            //Calculate the move speed
+            if (collisions.isOnGround()) {
                 aiMoveSpeed = moveSpeed / 2;
-                aiMoveSpeed *= 1.3F; //sprint modifier
-                aiMoveSpeed *= .16277136F / Math.pow(friction, 3);
+
+                if (actionTracker.isSprinting()) {
+                    aiMoveSpeed *= 1.3F; //sprint modifier
+                }
+
+                aiMoveSpeed *= .16277136F / Math.pow(collisions.getFrictionFactor(), 3);
             } else {
                 aiMoveSpeed = 0.026;
             }
 
-            double offsetV = location.getY() - currentLocation.getY();
-
-            if (offsetV > 0.2F && offsetV < 0.42F || collisionTracker.getCollisions().isCollidedVertically()) {
+            if (!(currentCollisions.isOnGround() && (currentCollisions.isUnderBlock() || collisions.isUnderBlock()) ||
+                    (offsetV > 0.2 && offsetV < 0.42F))) {
                 aiMoveSpeed += 0.2F;
             }
 
