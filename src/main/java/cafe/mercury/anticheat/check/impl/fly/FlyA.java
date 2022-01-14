@@ -27,8 +27,6 @@ public class FlyA extends PositionUpdateCheck {
     private final MovementTracker movementTracker = data.getMovementTracker();
     private final PotionTracker potionTracker = data.getPotionTracker();
 
-    private boolean lastOnGround;
-
     private double buffer;
 
     public FlyA(PlayerData playerData) {
@@ -44,7 +42,6 @@ public class FlyA extends PositionUpdateCheck {
          * a basic limit system to ensure that they're not jumping heigher than
          * a legitimate player is capable of doing
          */
-
         double maxOffsetV = DEFAULT_JUMP_HEIGHT; //set their maximum to the vanilla jump height before handling other conditions
 
         if (potionTracker.getAmplifier(PotionEffectType.JUMP) > 0) {
@@ -56,20 +53,12 @@ public class FlyA extends PositionUpdateCheck {
         }
 
         boolean groundStateChange = false;
-        if (collisionTracker.getPreviousCollisions().isOnGround() && !lastOnGround) {
+        if (collisionTracker.getCollisions().isMathematicallyOnGround()) {
             /*
             * Whether the player was mathematically on the ground in their last,
             * movement packet and was not on ground in this one.
-            *
-            * We want to handle things using slightly different ground calculations,
-            * since if we had only used mathematical ground, the player would be able
-            * to increase their jump height to a value that meets the condition
             */
-            if (offsetV > 0.5) {
-                groundStateChange = collisionTracker.getCollisions().isOnGround();
-            } else {
-                groundStateChange = collisionTracker.getCollisions().isMathematicallyOnGround();
-            }
+            groundStateChange = collisionTracker.getPreviousCollisions().isMathematicallyOnGround();
         }
 
         if (movementTracker.getVelocityV() > 0) {
@@ -81,11 +70,11 @@ public class FlyA extends PositionUpdateCheck {
             maxOffsetV += movementTracker.getVelocityV();
         }
 
-        if (collisionTracker.getCollisions().isCollidedVertically()) {
-            if (collisionTracker.getCollisions().isOnGround()) {
+        if ((collisionTracker.getCollisions().isCollidedVertically() && !collisionTracker.getCollisions().isOnGround()) || groundStateChange) {
+            if (collisionTracker.getCollisions().isCollidedHorizontally()) {
                 /*
                  * We want to handle collisions under certain situations where the
-                 * collision tracker states that the player is on the ground separately.
+                 * collision tracker states that the player is not collided horizontally
                  * Doing so prevents against false flags while running up stairs and jumping.
                  */
                 maxOffsetV += JUMP_BLOCK_INCREASE;
@@ -103,14 +92,12 @@ public class FlyA extends PositionUpdateCheck {
         boolean smallHop = offsetV > 0.03 && offsetV < DEFAULT_JUMP_HEIGHT &&
                 Math.abs(offsetV - maxOffsetV) > 0.05 && maxOffsetV < 0.5;
 
-        if (groundStateChange && (offsetV > maxOffsetV || smallHop)) {
+        if (offsetV > maxOffsetV || (smallHop && groundStateChange)) {
             if (++buffer > 3) {
                 fail(new Violation("offsetV", offsetV, "maxOffsetV", maxOffsetV));
             }
-        } else if (groundStateChange) {
+        } else if (groundStateChange && offsetV > 0) {
             buffer = Math.max(buffer - 0.3, 0);
         }
-
-        this.lastOnGround = collisionTracker.getPreviousCollisions().isMathematicallyOnGround();
     }
 }

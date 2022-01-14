@@ -16,6 +16,6 @@ public class PositionUpdateEvent {
         this.to = to;
         this.from = from;
         this.offsetH = MathUtil.hypot(Math.abs(to.getX() - from.getX()), Math.abs(to.getZ() - from.getZ()));
-        this.offsetV = Math.abs(to.getY() - from.getY());
+        this.offsetV = to.getY() - from.getY();
     }
 }

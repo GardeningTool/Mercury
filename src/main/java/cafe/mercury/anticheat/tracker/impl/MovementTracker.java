@@ -95,7 +95,7 @@ public class MovementTracker extends Tracker {
             }
 
             //Calculate the move speed
-            if (collisionTracker.getCollisions().isOnGround()) {
+            if (collisionTracker.getPreviousCollisions().isOnGround()) {
                 float friction = collisionTracker.getPreviousCollisions().getFrictionFactor();
 
                 aiMoveSpeed = moveSpeed / 2;
@@ -106,6 +106,7 @@ public class MovementTracker extends Tracker {
             }
 
             double offsetV = location.getY() - currentLocation.getY();
+
             if (offsetV > 0.2F && offsetV < 0.42F || collisionTracker.getCollisions().isCollidedVertically()) {
                 aiMoveSpeed += 0.2F;
             }
