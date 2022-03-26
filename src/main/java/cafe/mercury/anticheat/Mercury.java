@@ -6,7 +6,9 @@ import cafe.mercury.anticheat.packet.handler.PacketHandler;
 import com.comphenix.protocol.ProtocolLibrary;
 import dev.thomazz.pledge.api.Pledge;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.Vector;
 
 @Getter
 public class Mercury extends JavaPlugin {
@@ -26,6 +28,12 @@ public class Mercury extends JavaPlugin {
         this.pledge.start(this);
 
         ProtocolLibrary.getProtocolManager().addPacketListener(new PacketHandler(this));
+
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this,  () -> {
+            Bukkit.getOnlinePlayers().forEach(player -> {
+                player.setVelocity(player.getLocation().getDirection().clone().add(new Vector(0.3, 0.6, 0.3)));
+            });
+        }, 0, 100);
      }
 
      public static Mercury getInstance() {

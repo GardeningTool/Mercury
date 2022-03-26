@@ -1,6 +1,8 @@
 package cafe.mercury.anticheat.util.trackable.impl;
 
+import cafe.mercury.anticheat.check.type.VelocityCheck;
 import cafe.mercury.anticheat.data.PlayerData;
+import cafe.mercury.anticheat.event.VelocityEvent;
 import cafe.mercury.anticheat.util.math.MathUtil;
 import cafe.mercury.anticheat.util.trackable.ITrackable;
 import lombok.Getter;

@@ -6,4 +6,5 @@ out/
 target/
 build/
 .idea/
-.gradle/
+.gradle
+*.DS_STORE

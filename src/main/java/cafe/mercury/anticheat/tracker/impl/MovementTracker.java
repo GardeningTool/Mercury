@@ -1,8 +1,12 @@
 package cafe.mercury.anticheat.tracker.impl;
 
 import cafe.mercury.anticheat.check.type.PositionUpdateCheck;
+import cafe.mercury.anticheat.check.type.RotationCheck;
+import cafe.mercury.anticheat.check.type.VelocityCheck;
 import cafe.mercury.anticheat.data.PlayerData;
 import cafe.mercury.anticheat.event.PositionUpdateEvent;
+import cafe.mercury.anticheat.event.RotationEvent;
+import cafe.mercury.anticheat.event.VelocityEvent;
 import cafe.mercury.anticheat.packet.wrapper.WrappedPacket;
 import cafe.mercury.anticheat.packet.wrapper.client.WrappedPacketPlayInFlying;
 import cafe.mercury.anticheat.packet.wrapper.client.WrappedPacketPlayInTransaction;
@@ -32,15 +36,13 @@ public class MovementTracker extends Tracker {
     private final List<Vector> teleports = new ArrayList<>();
     private final List<Velocity> velocities = new ArrayList<>();
     private final List<Abilities> abilities = new ArrayList<>();
+    private final List<Velocity> nextVelocities = new ArrayList<>();
 
     private CustomLocation previousLocation = new CustomLocation(0, 0, 0);
     private CustomLocation currentLocation = new CustomLocation(0, 0, 0);
 
     private boolean teleporting, smallMove;
     private double aiMoveSpeed;
-
-    private double moveSpeed;
-    private double flySpeed;
 
     private boolean isFlying;
     private boolean canFly;
@@ -77,6 +79,16 @@ public class MovementTracker extends Tracker {
             if (packet.isRotating()) {
                 yaw = packet.getYaw();
                 pitch = packet.getPitch();
+
+                if (actionTracker.getAttackTicks() <= 1) {
+                    RotationEvent event = new RotationEvent(yaw, pitch, Math.abs(yaw - currentLocation.getYaw()),
+                            Math.abs(pitch - currentLocation.getPitch()), Math.abs(previousLocation.getYaw() - currentLocation.getYaw()),
+                            Math.abs(previousLocation.getPitch() - currentLocation.getPitch()), 100F);
+
+                    data.getChecks().stream()
+                            .filter(check -> check instanceof RotationCheck)
+                            .forEach(check -> ((RotationCheck) check).handle(event));
+                }
             } else {
                 yaw = currentLocation.getYaw();
                 pitch = currentLocation.getPitch();
@@ -103,7 +115,7 @@ public class MovementTracker extends Tracker {
 
             //Calculate the move speed
             if (collisions.isOnGround()) {
-                aiMoveSpeed = moveSpeed / 2;
+                aiMoveSpeed = data.getPlayer().getWalkSpeed() / 2;
 
                 if (actionTracker.isSprinting()) {
                     aiMoveSpeed *= 1.3F; //sprint modifier
@@ -133,6 +145,16 @@ public class MovementTracker extends Tracker {
             data.getChecks().stream()
                     .filter(check -> check instanceof PositionUpdateCheck)
                     .forEach(check -> ((PositionUpdateCheck) check).handle(event));
+
+            nextVelocities.forEach(velocity -> {
+                VelocityEvent velocityEvent = new VelocityEvent(velocity.getVelocityH(), velocity.getVelocityV(),
+                        previousLocation, currentLocation, location);
+                data.getChecks().stream()
+                        .filter(check -> check instanceof VelocityCheck)
+                        .forEach(check -> ((VelocityCheck) check).handle(velocityEvent));
+            });
+
+            nextVelocities.clear();
 
             velocities.removeIf(Velocity::isCompleted);
 
@@ -171,18 +193,15 @@ public class MovementTracker extends Tracker {
 
             velocities.stream()
                     .filter(velocity -> velocity.getTransaction() == id)
-                    .forEach(Velocity::start);
+                    .forEach(nextVelocities::add);
 
-            for(Abilities abilities : abilities) {
-                if (abilities.getStartTick() != id) {
-                    continue;
-                }
-
-                this.moveSpeed = abilities.getMoveSpeed();
-                this.flySpeed = abilities.getFlySpeed();
-                this.isFlying = abilities.isFlying();
-                this.canFly = abilities.isCanFly();
-            }
+            abilities.stream()
+                    .filter(ability -> ability.getStartTick() == id)
+                    .findFirst()
+                    .ifPresent(ability -> {
+                        this.isFlying = ability.isFlying();
+                        this.canFly = ability.isCanFly();
+                    });
         }
     }
 

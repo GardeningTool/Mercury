@@ -3,8 +3,10 @@ package cafe.mercury.anticheat.manager;
 import cafe.mercury.anticheat.check.Check;
 import cafe.mercury.anticheat.check.impl.badpackets.BadPacketsA;
 import cafe.mercury.anticheat.check.impl.fly.FlyA;
+import cafe.mercury.anticheat.check.impl.fly.FlyB;
 import cafe.mercury.anticheat.check.impl.reach.ReachA;
 import cafe.mercury.anticheat.check.impl.speed.SpeedA;
+import cafe.mercury.anticheat.check.impl.velocity.VelocityA;
 import cafe.mercury.anticheat.data.PlayerData;
 
 import java.lang.reflect.Constructor;
@@ -17,11 +19,13 @@ public class CheckManager {
     private static final List<Constructor<? extends Check<?>>> CHECK_CONSTRUCTORS = Stream.of(
             BadPacketsA.class,
 
-            FlyA.class,
+            FlyA.class, FlyB.class,
 
             ReachA.class,
 
-            SpeedA.class
+            SpeedA.class,
+
+            VelocityA.class
     ).map(clazz -> {
         try {
             return clazz.getDeclaredConstructor(PlayerData.class);

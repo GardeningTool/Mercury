@@ -12,7 +12,7 @@ public class ActionTracker extends Tracker {
 
     private boolean digging;
     private boolean placing;
-    private boolean attacking;
+    private int attackTicks;
     private boolean sneaking;
     private boolean sprinting;
 
@@ -58,12 +58,13 @@ public class ActionTracker extends Tracker {
             WrappedPacketPlayInUseEntity packet = (WrappedPacketPlayInUseEntity) paramPacket;
 
             if (packet.getAction() == EnumWrappers.EntityUseAction.ATTACK) {
-                attacking = true;
+                attackTicks = 0;
             }
         } else if (paramPacket instanceof WrappedPacketPlayInBlockPlace) {
             placing = true;
         } else if (paramPacket instanceof WrappedPacketPlayInFlying) {
-            attacking = placing = false;
+            attackTicks++;
+            placing = false;
         }
     }
 }

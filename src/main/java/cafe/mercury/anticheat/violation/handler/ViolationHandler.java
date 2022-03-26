@@ -30,11 +30,11 @@ public class ViolationHandler {
         }
 
         TextComponent textComponent = new TextComponent();
-        StringBuilder textBuilder = new StringBuilder("&7[&c*&7] &c");
+        StringBuilder textBuilder = new StringBuilder("&7(&6&l!&7) &e");
 
-        textBuilder.append(playerData.getPlayer().getName()).append(" &7failed &c")
-                .append(checkData.name()).append(" Check ").append(checkData.type())
-                .append(" &8(&7VL: ").append(violations).append("&8/").append(maxViolations).append(")");
+        textBuilder.append(playerData.getPlayer().getName()).append(" &7failed &e")
+                .append(checkData.name()).append(" ").append(checkData.type())
+                .append(" &7(&6").append(violations).append("&7/&6").append(maxViolations).append("&7)");
 
         textComponent.setText(ChatColor.translateAlternateColorCodes('&', textBuilder.toString()));
 
@@ -48,12 +48,12 @@ public class ViolationHandler {
             Object[] data = violation.getViolationData();
 
             for(int i = 0; i < data.length; i++) {
-                hoverComponentBuilder.append("&b")
-                        .append(data[i]).append(" &7")
-                        .append(data[++i]).append("\n");
+                hoverComponentBuilder.append("&6")
+                        .append(data[i]).append(" &7(&e")
+                        .append(data[++i]).append("&7)\n");
             }
 
-            hoverComponentBuilder.append("\n&bPing: &7").append(playerData.getPingTracker().getLastPing());
+            hoverComponentBuilder.append("\n&6Ping&7: &e").append(playerData.getPingTracker().getLastPing());
             hoverComponentBuilder.append("\n&7&l&m---------------------------------------&r");
 
             BaseComponent[] hoverComponents = new ComponentBuilder(ChatColor.translateAlternateColorCodes('&',

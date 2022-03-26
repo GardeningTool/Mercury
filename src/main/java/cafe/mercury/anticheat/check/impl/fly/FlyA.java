@@ -67,7 +67,7 @@ public class FlyA extends PositionUpdateCheck {
              * upwards. So, in order to compensate for that in this check, all we're
              * going to do is add their vertical velocity to their maximum velocity.
              */
-            maxOffsetV += movementTracker.getVelocityV();
+            maxOffsetV = movementTracker.getVelocityV() + 0.1; //testing something
         }
 
         if ((collisionTracker.getCollisions().isCollidedVertically() && !collisionTracker.getCollisions().isOnGround()) || groundStateChange) {

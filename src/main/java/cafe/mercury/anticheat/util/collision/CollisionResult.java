@@ -17,4 +17,7 @@ public class CollisionResult {
     private float frictionFactor;
     private boolean onGround;
 
+    public boolean isInLiquid() {
+        return isInLava || isInWater;
+    }
 }
