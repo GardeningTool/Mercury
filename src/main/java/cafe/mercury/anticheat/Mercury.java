@@ -29,11 +29,11 @@ public class Mercury extends JavaPlugin {
 
         ProtocolLibrary.getProtocolManager().addPacketListener(new PacketHandler(this));
 
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(this,  () -> {
-            Bukkit.getOnlinePlayers().forEach(player -> {
-                player.setVelocity(player.getLocation().getDirection().clone().add(new Vector(0.3, 0.6, 0.3)));
-            });
-        }, 0, 100);
+//        Bukkit.getScheduler().scheduleSyncRepeatingTask(this,  () -> {
+//            Bukkit.getOnlinePlayers().forEach(player -> {
+//                player.setVelocity(player.getLocation().getDirection().clone().add(new Vector(0.3, 0.6, 0.3)));
+//            });
+//        }, 0, 100);
      }
 
      public static Mercury getInstance() {
