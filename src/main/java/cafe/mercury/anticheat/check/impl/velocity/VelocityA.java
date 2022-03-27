@@ -23,7 +23,6 @@ public class VelocityA extends VelocityCheck {
 
     private final CollisionTracker collisionTracker = data.getCollisionTracker();
     private final MovementTracker movementTracker = data.getMovementTracker();
-    private final PotionTracker potionTracker = data.getPotionTracker();
 
     private int buffer;
 
@@ -35,21 +34,30 @@ public class VelocityA extends VelocityCheck {
     public void handle(VelocityEvent event) {
         CollisionResult collisions = collisionTracker.getCollisions();
 
-        if (collisions.isInCobweb() || collisions.isInLiquid() || collisions.isCollidedVertically() || movementTracker.isTeleporting()) {
+        /*
+        Certain collisions, such as the ones accounted for below, interfere with
+        the player's motion and shouldn't be checked
+         */
+
+        if (collisions.isInCobweb() || collisions.isInLiquid() || collisions.isUnderBlock()) {
             return;
         }
 
         CustomLocation previousLocation = event.getPreviousLocation();
         CustomLocation currentLocation = event.getCurrentLocation();
 
-        double previousY = previousLocation.getY();
-        double currentY = currentLocation.getY();
-
         double velocityV = event.getVelocityV();
-        double offsetV = Math.abs(currentY - previousY);
+        double offsetV = Math.abs(currentLocation.getY() - previousLocation.getY());
 
-        if (Math.abs(offsetV - JUMP_HEIGHT) > 0.05 && offsetV < velocityV && offsetV > 0.1) {
-            if (++buffer > 3) {
+        if (Math.abs(offsetV - JUMP_HEIGHT) > 0.05 && offsetV < velocityV && velocityV > 0.1) {
+            double ratio = offsetV / velocityV;
+
+            /*
+            On some occasions, I've found that the calculated ratio can sometimes be
+            just under 1, so in order to compensate for that, we'll check if the ratio
+            is just under that value
+             */
+            if (ratio < 0.99995 && !movementTracker.isTeleporting() && ++buffer > 3) {
                 fail(new Violation("ratio", offsetV / velocityV));
             }
         } else {

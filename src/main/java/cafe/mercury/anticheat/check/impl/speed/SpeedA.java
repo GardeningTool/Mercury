@@ -32,7 +32,7 @@ public class SpeedA extends PositionUpdateCheck {
     @Override
     public void handle(PositionUpdateEvent event) {
         double offsetH = event.getOffsetH();
-        double aiMoveSpeed = movementTracker.getAiMoveSpeed();
+        double aiMoveSpeed = movementTracker.getAiMoveSpeed() + movementTracker.getVelocityH();
 
         /*
          * We need to find the ratio at which the player is moving

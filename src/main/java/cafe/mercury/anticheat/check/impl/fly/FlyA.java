@@ -36,10 +36,10 @@ public class FlyA extends PositionUpdateCheck {
     //TODO: Add slime detection
     @Override
     public void handle(PositionUpdateEvent event) {
-        double offsetV = event.getOffsetV();
+        double offsetV = event.getTo().getY() - event.getFrom().getY();
         /*
          * Once we have the player's vertical movement offset, we can begin to implement
-         * a basic limit system to ensure that they're not jumping heigher than
+         * a basic limit system to ensure that they're not jumping higher than
          * a legitimate player is capable of doing
          */
         double maxOffsetV = DEFAULT_JUMP_HEIGHT; //set their maximum to the vanilla jump height before handling other conditions

@@ -131,8 +131,6 @@ public class MovementTracker extends Tracker {
                 aiMoveSpeed += 0.2F;
             }
 
-            aiMoveSpeed += getVelocityH();
-
             /*
              * Since potion effects affect your movement speed,
              * we have to modify our movement speed as well
@@ -205,7 +203,7 @@ public class MovementTracker extends Tracker {
         }
     }
 
-    private double getVelocityH() {
+    public double getVelocityH() {
         return velocities.stream()
                 .mapToDouble(Velocity::getVelocityH)
                 .sum();
