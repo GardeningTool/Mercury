@@ -1,10 +1,9 @@
 # Mercury
 An opensource &amp; featureful AntiCheat base
 
-## Authors
+## Credits
 
-- Gardening_Tool (George)
-- Numzskull (Vaziak)
-- Credits to sim0n for letting me use some of his math utilities and letting me use parts of his collision tracker
+- Dualzz (Collision tracking)
+- Sim0n (Math stuff)
 
-More features will be added soon
+I work on Mercury in my free time, and will likely be adding more checks in soon.
